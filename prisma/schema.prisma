@@ -1,0 +1,264 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Post {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  title        String
+  slug         String   @unique
+  excerpt      String
+  content      String
+  coverImage   String?
+  tags         String[]
+  category     String
+  metaTitle    String?
+  metaDesc     String?
+  focusKeyword String?
+  keywords     String[]
+  published    Boolean  @default(false)
+  views        Int      @default(0)
+  readTime     Int      @default(5)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// Each service has sub-items grouped by sub-heading
+model ServiceSubItem {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  serviceId   String  @db.ObjectId
+  heading     String          // e.g. "Discovery & Validation"
+  description String          // paragraph under the heading
+  bullets     String[]        // bullet list items
+  order       Int     @default(0)
+  service     Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+}
+
+// NOTE (MongoDB + existing data): every field added to a pre-existing model is
+// OPTIONAL. Prisma on MongoDB throws when a required field is missing from an
+// already-stored document, so legacy rows must stay readable without a backfill.
+// Application code treats `published == null` on a Service as "published".
+enum ServiceStage {
+  START
+  BUILD
+  GROW
+}
+
+enum PriceType {
+  FIXED
+  STARTING_AT
+  RANGE
+  CUSTOM_QUOTE
+}
+
+enum BillingPeriod {
+  ONE_OFF
+  MONTHLY
+  QUARTERLY
+  ANNUAL
+}
+
+model Service {
+  id          String           @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  slug        String           @unique
+  areaNumber  String           // "01", "02", etc.
+  tagline     String           // short intro under title
+  description String           // main paragraph
+  order       Int              @default(0)
+  featured    Boolean          @default(false)
+  subItems    ServiceSubItem[]
+  packages    ServicePackage[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  // ── Added for the agency rebuild (all optional, see note above) ──
+  stage            ServiceStage?   // Start / Build / Grow; null = "Advisory & delivery" group
+  icon             String?         // key from the allowlist in lib/icons.ts
+  published        Boolean?        // null/undefined is treated as published (legacy rows)
+  seoTitle         String?
+  seoDescription   String?
+  scope            String[]        // "what you get" inclusions
+  deliveryTimeline String?
+  ctaLabel         String?
+  ctaUrl           String?
+  faqs             Faq[]
+}
+
+// Priced offers. Whole currency units (e.g. 150000 = NGN 150,000) stored as Int:
+// no floating point, and 2.1bn is far above any realistic price.
+model ServicePackage {
+  id               String        @id @default(auto()) @map("_id") @db.ObjectId
+  name             String
+  slug             String        @unique
+  serviceId        String?       @db.ObjectId
+  service          Service?      @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  stage            ServiceStage?
+  audience         String?       // e.g. "Startups and sole proprietors"
+  summary          String
+  priceType        PriceType     @default(CUSTOM_QUOTE)
+  priceAmount      Int?
+  priceMin         Int?
+  priceMax         Int?
+  currency         String        @default("NGN")
+  billingPeriod    BillingPeriod @default(ONE_OFF)
+  deliveryTimeline String?
+  features         String[]
+  exclusions       String[]
+  notes            String?       // disclaimer shown under the card
+  featured         Boolean       @default(false)
+  published        Boolean       @default(false) // new packages start as drafts
+  order            Int           @default(0)
+  ctaLabel         String?
+  ctaUrl           String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+}
+
+model Faq {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  question  String
+  answer    String
+  serviceId String?  @db.ObjectId
+  service   Service? @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  published Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+type StoryMilestone {
+  label String   // free text, e.g. a year or phase name; never auto-generated
+  title String
+  body  String
+}
+
+type CompanyValue {
+  title String
+  body  String
+}
+
+// Single authoritative record (key = "company").
+model CompanySettings {
+  id                   String           @id @default(auto()) @map("_id") @db.ObjectId
+  key                  String           @unique @default("company")
+  companyName          String           @default("Calstins Ltd")
+  legalName            String?
+  registrationNumber   String?          // e.g. "RC 1234567" - only shown when verified
+  registrationVerified Boolean          @default(false)
+  publicEmail          String?
+  phone                String?
+  whatsapp             String?
+  addressLine          String?
+  city                 String?
+  country              String?
+  tagline              String?
+  storyHeadline        String?
+  storyBody            String?
+  storyPublished       Boolean          @default(false) // false = site uses built-in approved copy
+  mission              String?
+  milestones           StoryMilestone[]
+  values               CompanyValue[]
+  linkedin             String?
+  twitter              String?
+  instagram            String?
+  facebook             String?
+  github               String?
+  contactCtaTitle      String?
+  contactCtaBody       String?
+  pricingDisclaimer    String?
+  showContactDetails   Boolean?         // phone, WhatsApp and social links stay hidden until the owner turns this on
+  contactPromises      String[]         // "What to expect" bullets on the contact page
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+}
+
+model Project {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  slug        String   @unique
+  client      String
+  category    String
+  description String           // short paragraph
+  longDesc    String           // full engagement description
+  outcome     String           // outcome paragraph shown in card
+  url         String?
+  tags        String[]         // engagement type tags, no tech stack
+  coverImage  String?
+  featured    Boolean  @default(false)
+  partnership Boolean  @default(false)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Client {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  logo     String?
+  url      String?
+  industry String?
+  featured Boolean  @default(false)
+  order    Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model Testimonial {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  role      String
+  company   String
+  avatar    String?
+  quote     String
+  rating    Int      @default(5)
+  featured  Boolean  @default(false)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+// Engagement modes shown on home + services pages
+model EngagementMode {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  number      String           // "01", "02", "03"
+  title       String
+  description String
+  bullets     String[]
+  tag         String           // "Fixed-scope engagement" etc.
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+}
+
+model Contact {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  email     String
+  phone     String?
+  company   String?
+  service   String?
+  budget    String?
+  message   String
+  read      Boolean  @default(false)
+  replied   Boolean  @default(false)
+  replies   ContactReply[] // replies sent from the admin inbox (empty on older documents)
+  createdAt DateTime @default(now())
+}
+
+type ContactReply {
+  subject   String
+  message   String
+  sentAt    DateTime
+  emailSent Boolean
+  sentBy    String?
+}
+
+model Admin {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+}

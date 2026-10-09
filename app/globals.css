@@ -1,0 +1,257 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Design tokens. Colours are sampled from app/assets/calstins-logo.png:
+   --ink is the logo's own flat navy background (#172532) so the supplied asset
+   sits on a matching surface; --leaf is the light-green accent derived from the
+   logo's green node mark (~#50A050), lightened for use on navy.
+   Accessibility: --leaf is for large text, fills and rules on NAVY only.
+   On paper use --leaf-deep / --leaf-700 for any text (>= 4.5:1).
+   ───────────────────────────────────────────────────────────────────────────── */
+:root {
+  --ink: #172532;
+  --ink-2: #1f3344;
+  --ink-3: #2a4258;
+  --paper: #f6f4ee;
+  --paper-2: #edeae1;
+  --leaf: #7fdc8a;
+  --leaf-deep: #2f7d3a;
+  --leaf-700: #245f2d;
+  --blue: #3a78a8;
+
+  --text: #14212c;
+  --muted: #4a5b69;
+  --on-dark: #eef2f5;
+  --on-dark-muted: #a9b7c4;
+  --line-light: rgba(23, 37, 50, 0.14);
+  --line-dark: rgba(255, 255, 255, 0.14);
+  --focus: var(--ink);
+
+  --gutter: clamp(1.25rem, 4vw, 3rem);
+  --section: clamp(4.5rem, 9vw, 9rem);
+  --radius: 1.25rem;
+  --radius-sm: 0.75rem;
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur: 0.45s;
+
+  --fs-display: clamp(2.9rem, 1.4rem + 7.4vw, 7.75rem);
+  --fs-h1: clamp(2.5rem, 1.3rem + 5vw, 5.5rem);
+  --fs-h2: clamp(2rem, 1.2rem + 3.4vw, 4rem);
+  --fs-h3: clamp(1.25rem, 1.05rem + 0.9vw, 1.75rem);
+  --fs-lead: clamp(1.125rem, 1.02rem + 0.5vw, 1.375rem);
+}
+
+@layer base {
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-padding-top: 6rem; }
+  body {
+    background: var(--paper);
+    color: var(--text);
+    font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+  h1, h2, h3, h4 { font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif; text-wrap: balance; }
+  p { text-wrap: pretty; }
+  ::selection { background: var(--leaf); color: var(--ink); }
+
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 4px; }
+  .on-dark { --focus: var(--leaf); }
+
+  /* Admin keeps its slim dark scrollbar */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: var(--paper-2); }
+  ::-webkit-scrollbar-thumb { background: #b5b9ae; border-radius: 4px; }
+}
+
+/* ── Surfaces ─────────────────────────────────────────────────────────────── */
+@layer components {
+  .container-wide { width: 100%; max-width: 88rem; margin-inline: auto; padding-inline: var(--gutter); }
+  .container-read { width: 100%; max-width: 46rem; margin-inline: auto; padding-inline: var(--gutter); }
+
+  .surface-dark { background: var(--ink); color: var(--on-dark); --focus: var(--leaf); }
+  .surface-dark-2 { background: var(--ink-2); color: var(--on-dark); --focus: var(--leaf); }
+  .surface-light { background: var(--paper); color: var(--text); }
+  .surface-light-2 { background: var(--paper-2); color: var(--text); }
+  .section { padding-block: var(--section); }
+
+  .muted { color: var(--muted); }
+  .surface-dark .muted, .surface-dark-2 .muted { color: var(--on-dark-muted); }
+
+  /* ── Type ── */
+  .t-display { font-size: var(--fs-display); line-height: 0.92; letter-spacing: -0.035em; font-weight: 700; }
+  .t-h1 { font-size: var(--fs-h1); line-height: 0.98; letter-spacing: -0.03em; font-weight: 700; }
+  .t-h2 { font-size: var(--fs-h2); line-height: 1.02; letter-spacing: -0.028em; font-weight: 700; }
+  .t-h3 { font-size: var(--fs-h3); line-height: 1.15; letter-spacing: -0.015em; font-weight: 600; }
+  .t-lead { font-size: var(--fs-lead); line-height: 1.5; max-width: 38em; }
+  .measure { max-width: 62ch; }
+
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 0.75rem;
+    font-size: 0.78rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
+  }
+  .eyebrow::before { content: ""; width: 2rem; height: 2px; background: currentColor; opacity: 0.55; }
+  .surface-light .eyebrow, .surface-light-2 .eyebrow { color: var(--leaf-700); }
+  .surface-dark .eyebrow, .surface-dark-2 .eyebrow { color: var(--leaf); }
+
+  .accent-word { color: var(--leaf); }
+  .surface-light .accent-word, .surface-light-2 .accent-word { color: var(--leaf-deep); }
+
+  /* ── Buttons: pill with an arrow chip. The arrow nudges on hover/focus (CSS only). ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 0.75rem; justify-content: center;
+    min-height: 3.25rem; padding: 0.5rem 0.5rem 0.5rem 1.5rem; border-radius: 999px;
+    font-weight: 600; font-size: 0.975rem; line-height: 1; letter-spacing: -0.005em;
+    border: 1.5px solid transparent; cursor: pointer; text-decoration: none;
+    transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease), border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
+  }
+  .btn > .btn-arrow {
+    display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 999px;
+    transition: transform var(--dur) var(--ease), background-color var(--dur) var(--ease);
+  }
+  .btn:hover > .btn-arrow, .btn:focus-visible > .btn-arrow { transform: translateX(3px); }
+  .btn:active { transform: scale(0.985); }
+  .btn.btn-plain { padding-right: 1.5rem; }
+
+  .btn-leaf { background: var(--leaf); color: var(--ink); }
+  .btn-leaf .btn-arrow { background: var(--ink); color: var(--leaf); }
+  .btn-leaf:hover { background: #95e79e; }
+
+  .btn-ink { background: var(--ink); color: var(--paper); }
+  .btn-ink .btn-arrow { background: var(--leaf); color: var(--ink); }
+  .btn-ink:hover { background: var(--ink-3); }
+
+  .btn-outline-dark { border-color: var(--line-dark); color: var(--on-dark); }
+  .btn-outline-dark .btn-arrow { background: rgba(255,255,255,0.1); }
+  .btn-outline-dark:hover { border-color: var(--leaf); color: var(--leaf); }
+
+  .btn-outline-light { border-color: var(--ink); color: var(--ink); }
+  .btn-outline-light .btn-arrow { background: var(--ink); color: var(--paper); }
+  .btn-outline-light:hover { background: var(--ink); color: var(--paper); }
+  .btn-outline-light:hover .btn-arrow { background: var(--leaf); color: var(--ink); }
+
+  .link-arrow { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 600; text-decoration: underline; text-underline-offset: 0.3em; text-decoration-thickness: 1.5px; }
+  .link-arrow svg { transition: transform var(--dur) var(--ease); }
+  .link-arrow:hover svg, .link-arrow:focus-visible svg { transform: translateX(4px); }
+
+  /* ── Cards: only two styles on the whole site ── */
+  .panel { background: #fff; border: 1px solid var(--line-light); border-radius: var(--radius); padding: clamp(1.5rem, 1rem + 1.5vw, 2.25rem); transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
+  a.panel:hover, .panel.is-hoverable:hover { border-color: var(--ink); transform: translateY(-3px); box-shadow: 0 18px 40px -24px rgba(23,37,50,.45); }
+  .panel-dark { color: var(--on-dark); background: var(--ink-2); border: 1px solid var(--line-dark); border-radius: var(--radius); padding: clamp(1.5rem, 1rem + 1.5vw, 2.25rem); transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease); }
+  a.panel-dark:hover, .panel-dark.is-hoverable:hover { border-color: var(--leaf); transform: translateY(-3px); }
+
+  .rule { border: 0; border-top: 1px solid var(--line-light); }
+  .surface-dark .rule, .surface-dark-2 .rule { border-top-color: var(--line-dark); }
+
+  .chip { display: inline-flex; align-items: center; gap: .4rem; padding: .3rem .8rem; border-radius: 999px; border: 1px solid var(--line-light); font-size: .8rem; font-weight: 600; }
+  .surface-dark .chip { border-color: var(--line-dark); }
+
+  /* Form controls (public) */
+  .input {
+    width: 100%; min-height: 3.25rem; padding: .85rem 1rem; background: #fff; color: var(--text);
+    border: 1.5px solid rgba(23,37,50,.28); border-radius: var(--radius-sm); font-size: 1rem;
+    transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  }
+  .input::placeholder { color: #6b7a86; }
+  .input:hover { border-color: var(--ink); }
+  .input:focus-visible { outline: none; border-color: var(--ink); box-shadow: 0 0 0 4px rgba(127,220,138,.55); }
+  .input[aria-invalid="true"] { border-color: #b42318; }
+  textarea.input { min-height: 9rem; resize: vertical; }
+  .label { display: block; font-weight: 600; font-size: .9rem; margin-bottom: .4rem; }
+  .field-msg { color: #b42318; font-size: .85rem; margin-top: .35rem; font-weight: 500; }
+
+  /* Article typography (blog detail) */
+  .prose-site { font-size: 1.125rem; line-height: 1.75; color: #1d2c38; }
+  .prose-site > * + * { margin-top: 1.25em; }
+  .prose-site h2 { font-family: var(--font-display); font-size: 2rem; line-height: 1.1; letter-spacing: -0.02em; font-weight: 700; margin-top: 2.25em; color: var(--ink); }
+  .prose-site h3 { font-family: var(--font-display); font-size: 1.45rem; line-height: 1.2; font-weight: 600; margin-top: 1.9em; color: var(--ink); }
+  .prose-site a { color: var(--leaf-700); text-decoration: underline; text-underline-offset: .2em; }
+  .prose-site ul { list-style: disc; padding-left: 1.4em; }
+  .prose-site ol { list-style: decimal; padding-left: 1.4em; }
+  .prose-site li + li { margin-top: .4em; }
+  .prose-site blockquote { border-left: 4px solid var(--leaf); padding-left: 1.2em; font-style: italic; color: var(--muted); }
+  .prose-site img { border-radius: var(--radius-sm); max-width: 100%; height: auto; }
+  .prose-site pre { background: var(--ink); color: var(--on-dark); padding: 1rem 1.25rem; border-radius: var(--radius-sm); overflow-x: auto; font-size: .95rem; }
+  .prose-site code { font-family: ui-monospace, Menlo, monospace; font-size: .92em; background: var(--paper-2); padding: .1em .35em; border-radius: 4px; }
+  .prose-site pre code { background: none; padding: 0; }
+  .prose-site strong { color: var(--ink); }
+}
+
+/* ── Motion plumbing ──────────────────────────────────────────────────────────
+   Nothing is hidden unless (a) JS is running (html.js, set by an inline script),
+   (b) the visitor has not asked for reduced motion, and (c) the element opted in
+   with data-anim. A CSS failsafe un-hides everything after 3s even if GSAP never
+   loads, so core content can never stay invisible.                               */
+@keyframes anim-failsafe { to { opacity: 1; visibility: visible; transform: none; } }
+@media (prefers-reduced-motion: no-preference) {
+  html.js [data-anim] { opacity: 0; visibility: hidden; animation: anim-failsafe 0.01s 3s forwards; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+
+@keyframes fade-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.animate-fade-up { animation: fade-up 0.6s var(--ease) both; }
+
+/* ── Legacy admin component classes (kept so every admin screen keeps working) ── */
+@layer components {
+  .container-site { @apply max-w-7xl mx-auto px-6 lg:px-10; }
+  .btn-primary { @apply inline-flex items-center gap-2 px-6 py-3 bg-electric text-ink font-display font-bold rounded-full text-sm tracking-wide hover:bg-electric-dim transition-all duration-200; }
+  .btn-ghost { @apply inline-flex items-center gap-2 px-6 py-3 border border-ink-border text-snow font-display text-sm tracking-wide rounded-full hover:border-electric hover:text-electric transition-all duration-200; }
+  .section-label { @apply inline-flex items-center gap-2 text-electric font-mono text-xs tracking-[0.2em] uppercase mb-4; }
+  .section-title { @apply font-display text-4xl md:text-5xl lg:text-6xl font-bold text-snow leading-tight; }
+  .card-base { @apply bg-ink-card border border-ink-border rounded-xl p-6 hover:border-electric/30 transition-all duration-300; }
+  .prose-dark { @apply text-mist leading-relaxed; }
+  .prose-dark h1, .prose-dark h2, .prose-dark h3 { @apply text-snow font-display; }
+  .prose-dark p { @apply mb-4; }
+  .prose-dark ul { @apply list-disc list-inside mb-4; }
+  .prose-dark strong { @apply text-snow; }
+  .prose-dark code { @apply font-mono text-electric text-sm bg-ink-card px-1.5 py-0.5 rounded; }
+  .prose-dark pre { @apply bg-ink-card border border-ink-border rounded p-4 overflow-x-auto mb-4; }
+  .prose-dark blockquote { @apply border-l-2 border-electric pl-4 italic text-mist my-4; }
+  .prose-dark a { @apply text-electric hover:underline; }
+}
+
+@layer components {
+  .btn-sm { min-height: 2.75rem; padding: 0.35rem 0.35rem 0.35rem 1.15rem; font-size: 0.9rem; gap: 0.6rem; }
+  .btn-sm > .btn-arrow { width: 2rem; height: 2rem; }
+  .sr-only-focusable:not(:focus):not(:focus-within) { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  .nav-link { position: relative; padding-block: .5rem; font-weight: 500; font-size: .95rem; color: var(--on-dark-muted); transition: color var(--dur) var(--ease); }
+  .nav-link::after { content: ""; position: absolute; left: 0; right: 0; bottom: .1rem; height: 2px; background: var(--leaf); transform: scaleX(0); transform-origin: left; transition: transform var(--dur) var(--ease); }
+  .nav-link:hover, .nav-link[aria-current="page"] { color: #fff; }
+  .nav-link:hover::after, .nav-link[aria-current="page"]::after { transform: scaleX(1); }
+}
+
+/* SplitText line masks: a little breathing room so descenders are not clipped by overflow */
+.split-mask { padding-bottom: 0.26em; margin-bottom: -0.26em; }
+
+/* Hero engagement steps: the dots glow one after another, in a loop, to read as a step-by-step path. */
+@media (prefers-reduced-motion: no-preference) {
+  .steps-glow { --cycle: 5.4s; }
+  .step-dot { animation: step-glow var(--cycle) ease-in-out infinite; animation-delay: calc(var(--i, 0) * (var(--cycle) / 3)); }
+  .step-item > p:nth-of-type(2) { animation: step-text var(--cycle) ease-in-out infinite; animation-delay: calc(var(--i, 0) * (var(--cycle) / 3)); }
+}
+@keyframes step-glow {
+  0%, 38%, 100% { box-shadow: 0 0 0 0 rgba(127,220,138,0); transform: scale(1); filter: none; }
+  8% { box-shadow: 0 0 0 6px rgba(127,220,138,.28), 0 0 22px 6px rgba(127,220,138,.75); transform: scale(1.35); }
+  22% { box-shadow: 0 0 0 3px rgba(127,220,138,.15), 0 0 14px 3px rgba(127,220,138,.45); transform: scale(1.15); }
+}
+@keyframes step-text {
+  0%, 38%, 100% { color: inherit; }
+  8%, 22% { color: var(--leaf); }
+}
+
+/* Blog cards fade up as each batch is displayed while scrolling. */
+@media (prefers-reduced-motion: no-preference) {
+  .blog-card { animation: fade-up 0.7s var(--ease) both; }
+}
+
+/* Services mega menu entrance */
+@media (prefers-reduced-motion: no-preference) {
+  .mega-in { animation: fade-up 0.35s var(--ease) both; }
+}
