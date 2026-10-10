@@ -181,11 +181,11 @@ model Project {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   title       String
   slug        String   @unique
-  client      String
-  category    String
-  description String           // short paragraph
-  longDesc    String           // full engagement description
-  outcome     String           // outcome paragraph shown in card
+  client      String?
+  category    String?
+  description String?          // short paragraph
+  longDesc    String?          // full engagement description
+  outcome     String?          // outcome paragraph shown in card
   url         String?
   tags        String[]         // engagement type tags, no tech stack
   coverImage  String?

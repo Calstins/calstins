@@ -18,7 +18,10 @@ async function main() {
   }
   const hash = await bcrypt.hash(password, 12);
   const name = process.env.ADMIN_NAME || "Caleb Opule";
-  const admin = await prisma.admin.upsert({ where: { email }, update: { password: hash }, create: { email, password: hash, name } });
+  const existing = await prisma.admin.findUnique({ where: { email }, select: { id: true } });
+  const admin = existing
+    ? await prisma.admin.update({ where: { id: existing.id }, data: { password: hash } })
+    : await prisma.admin.create({ data: { email, password: hash, name } });
   console.log(`Admin ready: ${admin.email}`);
 }
 

@@ -195,7 +195,7 @@ async function main() {
 
   for (const s of services) {
     const want = !UNPUBLISHED.has(s.slug);
-    const existing = await prisma.service.findUnique({ where: { slug: s.slug } });
+    const existing = await prisma.service.findUnique({ where: { slug: s.slug }, select: { id: true, published: true, createdAt: true, updatedAt: true } });
     if (existing) {
       // Publish candidates created by the earlier version of this seed, but only if nobody has edited them.
       if (want && existing.published === false && untouched(existing)) { await prisma.service.update({ where: { id: existing.id }, data: { published: true } }); log.published++; }
@@ -208,19 +208,19 @@ async function main() {
   }
 
   for (const c of CASE_STUDIES) {
-    if (await prisma.project.findUnique({ where: { slug: c.slug } })) { log.skipped++; continue; }
+    if (await prisma.project.findUnique({ where: { slug: c.slug }, select: { id: true } })) { log.skipped++; continue; }
     await prisma.project.create({ data: { ...c, partnership: false } });
     log.created++;
   }
 
   for (const slug of OLD_PLACEHOLDER_PACKAGES) {
-    const old = await prisma.servicePackage.findUnique({ where: { slug } });
+    const old = await prisma.servicePackage.findUnique({ where: { slug }, select: { id: true, published: true, priceType: true, summary: true } });
     if (old && old.published === false && old.priceType === "CUSTOM_QUOTE" && old.summary.includes("(Draft: confirm scope")) { await prisma.servicePackage.delete({ where: { id: old.id } }); log.replaced++; }
   }
   for (const [i, p] of packages.entries()) {
-    if (await prisma.servicePackage.findUnique({ where: { slug: p.slug } })) { log.skipped++; continue; }
+    if (await prisma.servicePackage.findUnique({ where: { slug: p.slug }, select: { id: true } })) { log.skipped++; continue; }
     const { service: svcSlug, ...data } = p;
-    const linked = svcSlug ? await prisma.service.findUnique({ where: { slug: svcSlug } }) : null;
+    const linked = svcSlug ? await prisma.service.findUnique({ where: { slug: svcSlug }, select: { id: true } }) : null;
     await prisma.servicePackage.create({ data: { ...data, serviceId: linked?.id, currency: "NGN", order: i, published: true } });
     log.created++;
   }

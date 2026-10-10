@@ -22,11 +22,10 @@ export async function PUT(req: NextRequest) {
   if (denied) return denied;
   try {
     const data = await parseBody(req, settingsInput);
-    const saved = await prisma.companySettings.upsert({
-      where: { key: SETTINGS_KEY },
-      create: { key: SETTINGS_KEY, ...data },
-      update: data,
-    });
+    const existing = await prisma.companySettings.findUnique({ where: { key: SETTINGS_KEY }, select: { id: true } });
+    const saved = existing
+      ? await prisma.companySettings.update({ where: { id: existing.id }, data })
+      : await prisma.companySettings.create({ data: { key: SETTINGS_KEY, ...data } });
     return NextResponse.json(saved);
   } catch (e) {
     return errorResponse(e);

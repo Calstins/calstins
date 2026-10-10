@@ -1,6 +1,5 @@
 import "./load-env";
 import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcryptjs";
 import slugify from "slugify";
 
 const prisma = new PrismaClient();
@@ -17,27 +16,13 @@ const DESTRUCTIVE = process.env.ALLOW_DESTRUCTIVE_SEED === "true";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function fillMissing(model: any, key: string, rows: Record<string, any>[]) {
   for (const r of rows) {
-    if (await model.findFirst({ where: { [key]: r[key] } })) continue;
+    if (await model.findFirst({ where: { [key]: r[key] }, select: { id: true } })) continue;
     await model.create({ data: r });
   }
 }
 
 async function main() {
   console.log(DESTRUCTIVE ? "WARNING: destructive seed, existing content will be replaced.\n" : "Seeding Calstins content (adds anything missing, never overwrites)...\n");
-
-  // ── Admin ────────────────────────────────────────────────────────────────────
-  const adminEmail = (process.env.ADMIN_EMAIL || "admin@calstins.com").trim().toLowerCase();
-  const adminPassword = process.env.ADMIN_PASSWORD || "";
-  if (adminPassword.length >= 10) {
-    await prisma.admin.upsert({
-      where: { email: adminEmail },
-      update: {},
-      create: { email: adminEmail, password: await bcrypt.hash(adminPassword, 12), name: "Caleb Opule" },
-    });
-    console.log("Admin ready:", adminEmail);
-  } else {
-    console.log("Admin skipped: set ADMIN_PASSWORD (10+ characters) in .env, or run npm run admin:create.");
-  }
 
   // ── Engagement Modes (home + services pages) ─────────────────────────────────
   if (DESTRUCTIVE) await prisma.engagementMode.deleteMany({});
@@ -324,7 +309,7 @@ async function main() {
 
   // Older rows may have no area number; give them one so lists, menus and the admin form stay consistent.
   {
-    const all = await prisma.service.findMany({ orderBy: { createdAt: "asc" } });
+    const all = await prisma.service.findMany({ orderBy: { createdAt: "asc" }, select: { id: true, areaNumber: true } });
     let n = 0;
     for (const row of all) {
       n += 1;
@@ -334,7 +319,7 @@ async function main() {
 
   for (const svc of servicesData) {
     const { subItems, ...svcData } = svc;
-    if (await prisma.service.findUnique({ where: { slug: svcData.slug } })) continue;
+    if (await prisma.service.findUnique({ where: { slug: svcData.slug }, select: { id: true } })) continue;
     const created = await prisma.service.create({ data: svcData });
     for (const sub of subItems) {
       await prisma.serviceSubItem.create({ data: { ...sub, serviceId: created.id } });
@@ -767,10 +752,9 @@ async function main() {
 
   for (const post of posts) {
     const postSlug = sl(post.title);
-    await prisma.post.upsert({
-      where: { slug: postSlug },
-      update: {},
-      create: {
+    if (await prisma.post.findUnique({ where: { slug: postSlug }, select: { id: true } })) continue;
+    await prisma.post.create({
+      data: {
         ...post,
         slug: postSlug,
         published: true,

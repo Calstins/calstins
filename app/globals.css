@@ -255,3 +255,10 @@
 @media (prefers-reduced-motion: no-preference) {
   .mega-in { animation: fade-up 0.35s var(--ease) both; }
 }
+
+/* WhatsApp launcher: gentle pulse ring and panel entrance */
+@media (prefers-reduced-motion: no-preference) {
+  .wa-pulse { animation: wa-ring 2.8s ease-out infinite; }
+  .wa-pop { animation: fade-up 0.3s var(--ease) both; }
+}
+@keyframes wa-ring { 0% { box-shadow: 0 10px 30px -8px rgba(37,211,102,.8), 0 0 0 0 rgba(37,211,102,.45); } 70%, 100% { box-shadow: 0 10px 30px -8px rgba(37,211,102,.8), 0 0 0 16px rgba(37,211,102,0); } }

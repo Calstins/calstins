@@ -37,7 +37,7 @@ npx prisma generate
 ### 4. Create the admin and seed the database
 ```bash
 # Everything in one go (safe to re-run; only fills what is empty, never overwrites your edits):
-ADMIN_EMAIL=you@calstins.com ADMIN_PASSWORD='a-long-password' npm run setup
+npm run setup
 
 # Or step by step:
 ADMIN_EMAIL=you@calstins.com ADMIN_PASSWORD='a-long-password' npm run admin:create   # create the admin or reset its password
@@ -45,7 +45,7 @@ npm run seed            # work (projects), clients, testimonials, blog posts, or
 npm run seed:catalog    # Start/Build/Grow services, packages (incl. CAC, SEO), FAQs, story and settings
 npm run db:check        # confirm the app can reach MongoDB
 ```
-`ALLOW_DESTRUCTIVE_SEED=true npm run seed` wipes and recreates the seeded collections (disposable databases only). `ADMIN_PASSWORD` must be at least 10 characters or no admin is created.
+`ALLOW_DESTRUCTIVE_SEED=true npm run seed` wipes and recreates the seeded collections (disposable databases only). The seeds never create or touch admin accounts; use `npm run admin:create`.
 `JWT_SECRET` (16+ characters) must be set or login returns a clear 503. Replies from the admin inbox need `SMTP_HOST`, `SMTP_USER`, `SMTP_PASS`.
 
 If the database is unreachable the admin shows a "database did not respond" panel that retries when you are back online, and the public site shows a friendly error page. Unknown URLs show a branded 404 inside the site layout.

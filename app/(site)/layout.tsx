@@ -1,5 +1,6 @@
 import SiteHeader from "@/components/layout/SiteHeader";
 import SiteFooter from "@/components/layout/SiteFooter";
+import WhatsAppWidget from "@/components/layout/WhatsAppWidget";
 import { getPublishedPackages, getPublishedServices, groupByStage } from "@/lib/data";
 import { getPublicSettings } from "@/lib/settings";
 import { SITE_URL, absoluteUrl } from "@/lib/seo";
@@ -42,6 +43,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
           services={services.slice(0, 5).map((s) => ({ title: s.title, slug: s.slug }))}
         />
       </div>
+      {settings.whatsapp && <WhatsAppWidget number={settings.whatsapp} company={settings.companyName} />}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(org).replace(/</g, "\\u003c") }} />
     </>
   );
