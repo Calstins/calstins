@@ -14,7 +14,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   // Services mega menu: grouped Start / Build / Grow (plus advisory), straight from the published services.
   const menu = groupByStage(services).map((g) => ({
     key: g.key, label: g.label, kicker: g.kicker,
-    items: g.items.map((s) => ({ slug: s.slug, title: s.title, tagline: s.tagline, icon: s.icon ?? null })),
+    items: g.items.map((s) => ({ slug: s.slug, title: s.title, tagline: s.tagline ?? "", icon: s.icon ?? null })),
   }));
 
   // Organization structured data: only facts that are verified/present. The registration number is deliberately NOT included.

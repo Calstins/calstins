@@ -322,6 +322,16 @@ async function main() {
     },
   ];
 
+  // Older rows may have no area number; give them one so lists, menus and the admin form stay consistent.
+  {
+    const all = await prisma.service.findMany({ orderBy: { createdAt: "asc" } });
+    let n = 0;
+    for (const row of all) {
+      n += 1;
+      if (!row.areaNumber) await prisma.service.update({ where: { id: row.id }, data: { areaNumber: String(n).padStart(2, "0") } });
+    }
+  }
+
   for (const svc of servicesData) {
     const { subItems, ...svcData } = svc;
     if (await prisma.service.findUnique({ where: { slug: svcData.slug } })) continue;

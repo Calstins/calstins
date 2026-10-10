@@ -213,7 +213,7 @@ export function ProjectsAdmin() {
       </div>
       <div className="space-y-3">
         {items.map(p => (
-          <div key={p.id} className="card-base flex items-center justify-between gap-4">
+          <div key={p.id} className="card-base flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="font-display font-600 text-snow">{p.title}</span>
@@ -372,7 +372,7 @@ export function TestimonialsAdmin() {
       </div>
       <div className="space-y-3">
         {items.map(t => (
-          <div key={t.id} className="card-base flex items-start justify-between gap-4">
+          <div key={t.id} className="card-base flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-sm bg-electric/10 flex items-center justify-center font-display font-700 text-electric flex-shrink-0">{t.name[0]}</div>
               <div>
@@ -381,7 +381,7 @@ export function TestimonialsAdmin() {
                 <p className="text-mist text-xs mt-1 line-clamp-2 italic">&ldquo;{t.quote}&rdquo;</p>
               </div>
             </div>
-            <div className="flex gap-1 flex-shrink-0">
+            <div className="flex gap-1 flex-shrink-0 self-end sm:self-auto">
               <button onClick={() => setForm(t)} className="p-1.5 text-mist hover:text-electric"><Edit size={12} /></button>
               <button onClick={() => del(t.id)} className="p-1.5 text-mist hover:text-red-400"><Trash2 size={12} /></button>
             </div>

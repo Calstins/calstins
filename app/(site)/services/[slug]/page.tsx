@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const svc = await getPublishedServiceBySlug(slug);
   if (!svc) return { title: "Service not found", robots: { index: false } };
-  return pageMetadata({ title: svc.seoTitle || svc.title, description: svc.seoDescription || svc.tagline, path: `/services/${svc.slug}` });
+  return pageMetadata({ title: svc.seoTitle || svc.title, description: svc.seoDescription || svc.tagline || svc.description || "", path: `/services/${svc.slug}` });
 }
 
 export default async function ServiceDetailPage({ params }: Props) {
@@ -50,7 +50,7 @@ export default async function ServiceDetailPage({ params }: Props) {
           </nav>
           <div className="grid gap-12 lg:grid-cols-[1.5fr_1fr] lg:items-end">
             <div>
-              <p data-anim className="eyebrow mb-6">{svc.areaNumber} · {stageLabel}</p>
+              <p data-anim className="eyebrow mb-6">{svc.areaNumber ? `${svc.areaNumber} · ` : ""}{stageLabel}</p>
               <h1 data-anim data-split className="t-h1">{svc.title}</h1>
               <p data-anim className="t-lead mt-8 text-[color:var(--on-dark)]">{svc.tagline}</p>
               <div data-anim className="mt-10 flex flex-wrap items-center gap-4">

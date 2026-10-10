@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import Intro from "@/components/motion/Intro";
 import Reveal from "@/components/motion/Reveal";
-import Parallax from "@/components/motion/Parallax";
+import AgencyScene from "@/components/motion/AgencyScene";
 import StoryTimeline from "@/components/motion/StoryTimeline";
 import ArrowButton from "@/components/ui/ArrowButton";
 import SectionHeader from "@/components/ui/SectionHeader";
@@ -27,8 +27,10 @@ export default async function HomePage() {
   return (
     <>
       {/* ───────── Hero ───────── */}
-      <section className="surface-dark relative overflow-hidden">
-        <Intro className="container-wide relative grid gap-16 pb-24 pt-20 md:pb-32 md:pt-28 lg:grid-cols-[1.45fr_1fr] lg:items-center lg:gap-10">
+      <section className="surface-dark relative isolate overflow-hidden">
+        {/* WebGL scene: the globe sits behind the right column, the particle field and ribbons span the whole hero. */}
+        <AgencyScene className="absolute inset-0 -z-10 h-full w-full" />
+        <Intro className="container-wide relative z-10 grid gap-16 pb-24 pt-20 md:pb-32 md:pt-28 lg:grid-cols-[1.45fr_1fr] lg:items-center lg:gap-10">
           <div>
             <p data-anim className="eyebrow mb-8">{HERO.eyebrow}</p>
             <h1 data-anim data-split className="t-display">
@@ -41,15 +43,8 @@ export default async function HomePage() {
             </div>
           </div>
 
-          {modes.length > 0 && (
-            <div className="relative grid place-items-center lg:min-h-[34rem]">
-              <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 hidden h-[34rem] w-[34rem] -translate-x-1/2 -translate-y-1/2 lg:block">
-                <Parallax className="h-full w-full" distance={-60}>
-                  <div className="h-full w-full rounded-full border border-leaf/25" />
-                  <div className="absolute inset-12 rounded-full border border-white/10" />
-                  <div className="absolute inset-28 rounded-full bg-leaf/10 blur-3xl" />
-                </Parallax>
-              </div>
+          <div data-scene-anchor className="relative grid min-h-[20rem] place-items-center sm:min-h-[26rem] lg:min-h-[34rem]">
+            {modes.length > 0 && (
             <ol data-anim className="steps-glow relative w-fit max-w-full space-y-0 border-l border-white/15 pl-8" aria-label="How an engagement progresses">
               {modes.map((m, i) => (
                 <li key={m.id} className="step-item relative pb-9 last:pb-0" style={{ ["--i" as string]: i }}>
@@ -60,8 +55,8 @@ export default async function HomePage() {
                 </li>
               ))}
             </ol>
-            </div>
-          )}
+            )}
+          </div>
         </Intro>
       </section>
 

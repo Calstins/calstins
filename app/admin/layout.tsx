@@ -87,9 +87,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       )}
 
       {/* Main */}
-      <div className="flex-1 lg:ml-56">
+      <div className="min-w-0 flex-1 lg:ml-56">
         {/* Topbar */}
-        <header className="sticky top-0 z-30 bg-ink/90 backdrop-blur border-b border-ink-border px-6 py-3 flex items-center justify-between">
+        <header className="sticky top-0 z-30 bg-ink/90 backdrop-blur border-b border-ink-border px-4 sm:px-6 py-3 flex items-center justify-between">
           <button onClick={() => setOpen(!open)} className="lg:hidden text-mist hover:text-snow">
             <Menu size={20} />
           </button>
@@ -106,7 +106,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </a>
         </header>
 
-        <main className="p-6"><ToastProvider>{children}</ToastProvider></main>
+        <main className="p-4 sm:p-6"><ToastProvider>{children}</ToastProvider></main>
       </div>
     </div>
   );

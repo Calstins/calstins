@@ -21,8 +21,8 @@ export default async function ServicesPage() {
   const labelFor = new Map(groups.map((g) => [g.key as string, g.label]));
   const explorer: ExplorerService[] = groups.flatMap((g) =>
     g.items.map((s) => ({
-      id: s.id, slug: s.slug, title: s.title, tagline: s.tagline, icon: s.icon ?? null, group: g.key, groupLabel: labelFor.get(g.key) ?? "",
-      scope: s.scope?.length ? s.scope : s.subItems.map((i) => i.heading), timeline: s.deliveryTimeline ?? null, number: s.areaNumber,
+      id: s.id, slug: s.slug, title: s.title, tagline: s.tagline ?? "", icon: s.icon ?? null, group: g.key, groupLabel: labelFor.get(g.key) ?? "",
+      scope: s.scope?.length ? s.scope : s.subItems.map((i) => i.heading), timeline: s.deliveryTimeline ?? null, number: s.areaNumber ?? "",
     })),
   );
   const stagedKeys = groups.map((g) => g.key).filter(isStageKey);

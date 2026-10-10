@@ -175,7 +175,7 @@ export default function AdminPackagesPage() {
             const idx = (items ?? []).findIndex((x) => x.id === p.id);
             const price = formatPrice(p);
             return (
-              <li key={p.id} className="card-base flex items-start justify-between gap-4">
+              <li key={p.id} className="card-base flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
                     <span className="font-display font-semibold text-snow">{p.name}</span>
@@ -185,7 +185,7 @@ export default function AdminPackagesPage() {
                   <p className="text-sm text-snow">{price.typeLabel}{price.amount ? <> · <span className="text-electric">{price.amount}</span> <span className="text-mist">{price.period}</span></> : null}</p>
                   <p className="text-mist text-xs mt-1 truncate">{svcName(p.serviceId) ? `${svcName(p.serviceId)} · ` : "Standalone · "}{p.features.length} inclusions</p>
                 </div>
-                <div className="flex gap-1 flex-shrink-0 items-center">
+                <div className="flex gap-1 flex-shrink-0 items-center self-end sm:self-auto">
                   <button type="button" aria-label={`Move ${p.name} up`} disabled={filtering || idx <= 0} onClick={() => move(idx, -1)} className="p-2 text-mist hover:text-snow disabled:opacity-30"><ArrowUp size={14} /></button>
                   <button type="button" aria-label={`Move ${p.name} down`} disabled={filtering || idx === (items?.length ?? 0) - 1} onClick={() => move(idx, 1)} className="p-2 text-mist hover:text-snow disabled:opacity-30"><ArrowDown size={14} /></button>
                   <button type="button" aria-label={p.published ? `Unpublish ${p.name}` : `Publish ${p.name}`} onClick={() => quickPatch(p, { published: !p.published })} className="p-2 text-mist hover:text-electric">{p.published ? <EyeOff size={14} /> : <Eye size={14} />}</button>

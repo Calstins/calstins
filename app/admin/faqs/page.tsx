@@ -87,12 +87,12 @@ export default function AdminFaqsPage() {
       {items === null ? <ListSkeleton /> : items.length === 0 ? <EmptyState>No FAQs yet. The public FAQ sections stay hidden until you publish at least one.</EmptyState> : (
         <ul className="space-y-3">
           {items.map((f, idx) => (
-            <li key={f.id} className="card-base flex items-start justify-between gap-4">
+            <li key={f.id} className="card-base flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1"><span className="font-display font-semibold text-snow">{f.question}</span>{f.published ? <Chip tone="green">Published</Chip> : <Chip tone="amber">Draft</Chip>}</div>
                 <p className="text-mist text-xs truncate">{f.answer}</p>
               </div>
-              <div className="flex gap-1 items-center">
+              <div className="flex gap-1 items-center self-end sm:self-auto">
                 <button type="button" aria-label="Move up" disabled={idx === 0} onClick={() => move(idx, -1)} className="p-2 text-mist hover:text-snow disabled:opacity-30"><ArrowUp size={14} /></button>
                 <button type="button" aria-label="Move down" disabled={idx === items.length - 1} onClick={() => move(idx, 1)} className="p-2 text-mist hover:text-snow disabled:opacity-30"><ArrowDown size={14} /></button>
                 <button type="button" aria-label={`Edit ${f.question}`} onClick={() => { setErrors({}); setForm(f); }} className="p-2 text-mist hover:text-electric"><Edit size={14} /></button>

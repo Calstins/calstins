@@ -85,7 +85,7 @@ export default function AdminProjectsPage() {
       </div>
       <div className="space-y-3">
         {items.map(p => (
-          <div key={p.id} className="card-base flex items-start justify-between gap-4">
+          <div key={p.id} className="card-base flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap mb-1">
                 <span className="font-display font-600 text-snow">{p.title}</span>
@@ -96,7 +96,7 @@ export default function AdminProjectsPage() {
               <p className="text-mist text-xs truncate">{p.description}</p>
               {p.outcome && <p className="text-mist/40 text-xs mt-0.5 italic truncate">Outcome: {p.outcome}</p>}
             </div>
-            <div className="flex gap-2 flex-shrink-0">
+            <div className="flex gap-2 flex-shrink-0 self-end sm:self-auto">
               <button onClick={() => setForm(p)} className="p-2 text-mist hover:text-electric"><Edit size={14} /></button>
               <button onClick={() => del(p.id)} className="p-2 text-mist hover:text-red-400"><Trash2 size={14} /></button>
             </div>

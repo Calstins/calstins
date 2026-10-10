@@ -54,7 +54,7 @@ export default function AdminBlogPage() {
           {posts.map((post) => (
             <div
               key={post.slug}
-              className="card-base flex items-center justify-between gap-4"
+              className="card-base flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
             >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">

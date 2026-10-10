@@ -66,9 +66,9 @@ model Service {
   id          String           @id @default(auto()) @map("_id") @db.ObjectId
   title       String
   slug        String           @unique
-  areaNumber  String           // "01", "02", etc.
-  tagline     String           // short intro under title
-  description String           // main paragraph
+  areaNumber  String?          // "01", "02", etc. (optional: older rows may have none)
+  tagline     String?          // short intro under title
+  description String?          // main paragraph
   order       Int              @default(0)
   featured    Boolean          @default(false)
   subItems    ServiceSubItem[]

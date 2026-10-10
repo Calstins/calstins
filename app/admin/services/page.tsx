@@ -79,7 +79,7 @@ export default function AdminServicesPage() {
 
   const openForm = (s: ServiceRow) => {
     setErrors({});
-    setForm({ ...blank(), ...s, published: isLive(s), seoTitle: s.seoTitle ?? "", seoDescription: s.seoDescription ?? "", deliveryTimeline: s.deliveryTimeline ?? "", ctaLabel: s.ctaLabel ?? "", ctaUrl: s.ctaUrl ?? "", scope: s.scope ?? [], subItems: s.subItems ?? [] });
+    setForm({ ...blank(), ...s, published: isLive(s), areaNumber: s.areaNumber ?? "", tagline: s.tagline ?? "", description: s.description ?? "", seoTitle: s.seoTitle ?? "", seoDescription: s.seoDescription ?? "", deliveryTimeline: s.deliveryTimeline ?? "", ctaLabel: s.ctaLabel ?? "", ctaUrl: s.ctaUrl ?? "", scope: s.scope ?? [], subItems: s.subItems ?? [] });
   };
 
   const save = async () => {
@@ -195,7 +195,7 @@ export default function AdminServicesPage() {
           {visible.map((s) => {
             const idx = (items ?? []).findIndex((x) => x.id === s.id);
             return (
-              <li key={s.id} className="card-base flex items-start justify-between gap-4">
+              <li key={s.id} className="card-base flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
                     <span className="font-display font-semibold text-snow">{s.title}</span>
@@ -206,7 +206,7 @@ export default function AdminServicesPage() {
                   <p className="text-mist text-xs truncate">{s.tagline}</p>
                   <p className="text-mist/60 text-xs mt-1">/{s.slug} · {s.subItems?.length ?? 0} detail sections · {s._count?.packages ?? 0} packages</p>
                 </div>
-                <div className="flex gap-1 flex-shrink-0 items-center">
+                <div className="flex gap-1 flex-shrink-0 items-center self-end sm:self-auto">
                   <button type="button" aria-label={`Move ${s.title} up`} disabled={filtering || idx <= 0} onClick={() => move(idx, -1)} className="p-2 text-mist hover:text-snow disabled:opacity-30"><ArrowUp size={14} /></button>
                   <button type="button" aria-label={`Move ${s.title} down`} disabled={filtering || idx === (items?.length ?? 0) - 1} onClick={() => move(idx, 1)} className="p-2 text-mist hover:text-snow disabled:opacity-30"><ArrowDown size={14} /></button>
                   <button type="button" aria-label={isLive(s) ? `Unpublish ${s.title}` : `Publish ${s.title}`} onClick={() => quickToggle(s, { published: !isLive(s) })} className="p-2 text-mist hover:text-electric">{isLive(s) ? <EyeOff size={14} /> : <Eye size={14} />}</button>
