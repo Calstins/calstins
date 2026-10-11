@@ -43,7 +43,7 @@ export default function WhatsAppWidget({ number, company }: { number: string; co
             <span className="grid h-10 w-10 place-items-center rounded-full bg-white/15"><MessageCircle size={20} aria-hidden /></span>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold">{company}</p>
-              <p className="text-xs text-white/80">{number} · replies within 24 hours</p>
+              <p className="text-xs text-white/80">We will replies within 24 hours</p>
             </div>
             <button type="button" onClick={() => { setOpen(false); btn.current?.focus(); }} aria-label="Close chat" className="grid h-8 w-8 place-items-center rounded-full hover:bg-white/15"><X size={16} aria-hidden /></button>
           </header>
