@@ -1,16 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAdminFromRequest } from "@/lib/auth";
+import { errorResponse, requireAdmin, HttpError } from "@/lib/api";
+import { pick, pickNew, toSlug, MODE_SHAPE } from "@/lib/legacy-crud";
 
 export async function GET() {
-  const modes = await prisma.engagementMode.findMany({ orderBy: { order: "asc" } });
-  return NextResponse.json(modes);
+  try { return NextResponse.json(await prisma.engagementMode.findMany({ orderBy: { order: "asc" } })); }
+  catch (e) { return errorResponse(e); }
 }
 
 export async function POST(req: NextRequest) {
-  const admin = await getAdminFromRequest(req);
-  if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const body = await req.json();
-  const mode = await prisma.engagementMode.create({ data: body });
-  return NextResponse.json(mode, { status: 201 });
+  const denied = await requireAdmin(req);
+  if (denied) return denied;
+  try {
+    const data = pickNew(await req.json().catch(() => null), MODE_SHAPE, ["title"]);
+    return NextResponse.json(await prisma.engagementMode.create({ data: data as never }), { status: 201 });
+  } catch (e) { return errorResponse(e); }
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { saveJson } from "@/lib/admin-save";
 import { Plus, Edit, Trash2, ArrowLeft, Save, Upload, Star, X } from "lucide-react";
 
 // ── Generic Tag/Array Input ────────────────────────────────────────────────────
@@ -249,10 +250,10 @@ export function ClientsAdmin() {
 
   const save = async () => {
     setSaving(true);
-    const method = form.id ? "PUT" : "POST";
-    const url = form.id ? `/api/clients/${form.id}` : "/api/clients";
-    await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
-    setSaving(false); fetch_(); setForm(null);
+    const r = await saveJson(form.id ? `/api/clients/${form.id}` : "/api/clients", form.id ? "PUT" : "POST", form);
+    setSaving(false);
+    if (!r.ok) { alert(r.error); return; }
+    fetch_(); setForm(null);
   };
 
   const del = async (id: string) => {
@@ -326,10 +327,10 @@ export function TestimonialsAdmin() {
 
   const save = async () => {
     setSaving(true);
-    const method = form.id ? "PUT" : "POST";
-    const url = form.id ? `/api/testimonials/${form.id}` : "/api/testimonials";
-    await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, rating: Number(form.rating) }) });
-    setSaving(false); fetch_(); setForm(null);
+    const r = await saveJson(form.id ? `/api/testimonials/${form.id}` : "/api/testimonials", form.id ? "PUT" : "POST", { ...form, rating: Number(form.rating) });
+    setSaving(false);
+    if (!r.ok) { alert(r.error); return; }
+    fetch_(); setForm(null);
   };
 
   const del = async (id: string) => {

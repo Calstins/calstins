@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAdminFromRequest } from "@/lib/auth";
+import { errorResponse, requireAdmin } from "@/lib/api";
+import { pick, toSlug, POST_SHAPE } from "@/lib/legacy-crud";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -21,13 +23,17 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
 }
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  const admin = await getAdminFromRequest(req);
-  if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const body = await req.json();
-  const post = await prisma.post.update({ where: { slug: slug }, data: body });
-  return NextResponse.json(post);
+  const denied = await requireAdmin(req);
+  if (denied) return denied;
+  try {
+    const { slug } = await params;
+    const data = pick(await req.json().catch(() => null), POST_SHAPE, ["title", "excerpt", "content", "category"]);
+    if (typeof data.slug === "string") data.slug = toSlug(data.slug) || undefined;
+    if (data.slug === undefined) delete data.slug;
+    return NextResponse.json(await prisma.post.update({ where: { slug }, data: data as never }));
+  } catch (e) {
+    return errorResponse(e);
+  }
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {

@@ -1,27 +1,36 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAdminFromRequest } from "@/lib/auth";
+import { errorResponse, requireAdmin, HttpError } from "@/lib/api";
+import { pick, pickNew, toSlug, PROJECT_SHAPE } from "@/lib/legacy-crud";
 
-export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const p = await prisma.project.findUnique({ where: { id: id } });
-  if (!p) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  return NextResponse.json(p);
+type Ctx = { params: Promise<{ id: string }> };
+
+export async function GET(_: NextRequest, { params }: Ctx) {
+  try {
+    const { id } = await params;
+    const p = await prisma.project.findUnique({ where: { id } });
+    return p ? NextResponse.json(p) : NextResponse.json({ error: "Not found" }, { status: 404 });
+  } catch (e) { return errorResponse(e); }
 }
 
-export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const admin = await getAdminFromRequest(req);
-  if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const body = await req.json();
-  const p = await prisma.project.update({ where: { id: id }, data: body });
-  return NextResponse.json(p);
+export async function PUT(req: NextRequest, { params }: Ctx) {
+  const denied = await requireAdmin(req);
+  if (denied) return denied;
+  try {
+    const { id } = await params;
+    const data = pick(await req.json().catch(() => null), PROJECT_SHAPE, ["title"]);
+    if (typeof data.slug === "string") data.slug = toSlug(data.slug) || undefined;
+    if (data.slug === undefined) delete data.slug;
+    return NextResponse.json(await prisma.project.update({ where: { id }, data: data as never }));
+  } catch (e) { return errorResponse(e); }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const admin = await getAdminFromRequest(req);
-  if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  await prisma.project.delete({ where: { id: id } });
-  return NextResponse.json({ success: true });
+export async function DELETE(req: NextRequest, { params }: Ctx) {
+  const denied = await requireAdmin(req);
+  if (denied) return denied;
+  try {
+    const { id } = await params;
+    await prisma.project.delete({ where: { id } });
+    return NextResponse.json({ success: true });
+  } catch (e) { return errorResponse(e); }
 }

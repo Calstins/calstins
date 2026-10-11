@@ -122,14 +122,14 @@ export default function BlogEditor({ isEdit = false }: { isEdit?: boolean }) {
       body: JSON.stringify(payload),
     });
 
+    const data = await res.json().catch(() => ({}));
     if (res.ok) {
-      const data = await res.json();
       setMsgType("ok");
       setMsg(publish ? "Published!" : "Saved as draft");
       if (!isEdit) router.push(`/admin/blog/${data.slug}/edit`);
     } else {
       setMsgType("err");
-      setMsg("Save failed — check all required fields");
+      setMsg(res.status === 401 ? "Session expired. Sign in again." : data?.error ? `Save failed: ${data.error}` : "Save failed — check all required fields");
     }
     setSaving(false);
     setTimeout(() => setMsg(""), 3000);

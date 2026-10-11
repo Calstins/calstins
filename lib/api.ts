@@ -41,7 +41,7 @@ type PrismaLikeError = { code?: string; meta?: { target?: unknown } };
 
 export function errorResponse(err: unknown): NextResponse {
   if (err instanceof HttpError) {
-    return NextResponse.json({ error: err.message, details: err.details }, { status: err.status });
+    return NextResponse.json({ error: err.message, details: err.details, fields: err.details && typeof err.details === "object" ? err.details : undefined }, { status: err.status });
   }
   if (err instanceof ZodError) {
     return NextResponse.json({ error: "Validation failed", fields: fieldErrors(err) }, { status: 400 });

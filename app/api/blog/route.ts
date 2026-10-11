@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAdminFromRequest } from "@/lib/auth";
-import slugify from "slugify";
+import { errorResponse, requireAdmin, HttpError } from "@/lib/api";
+import { pickNew, toSlug, POST_SHAPE } from "@/lib/legacy-crud";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -36,15 +37,14 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const admin = await getAdminFromRequest(req);
-  if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const body = await req.json();
-  const slug = body.slug || slugify(body.title, { lower: true, strict: true });
-
-  const post = await prisma.post.create({
-    data: { ...body, slug },
-  });
-
-  return NextResponse.json(post, { status: 201 });
+  const denied = await requireAdmin(req);
+  if (denied) return denied;
+  try {
+    const data = pickNew(await req.json().catch(() => null), POST_SHAPE, ["title", "excerpt", "content", "category"]);
+    data.slug = (data.slug as string) ? toSlug(data.slug as string) : toSlug(data.title as string);
+    if (!data.slug) throw new HttpError(400, "Title or slug must contain letters or numbers", { slug: "Required" });
+    return NextResponse.json(await prisma.post.create({ data: data as never }), { status: 201 });
+  } catch (e) {
+    return errorResponse(e);
+  }
 }

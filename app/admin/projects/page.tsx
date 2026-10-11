@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { saveJson } from "@/lib/admin-save";
 import { Plus, Edit, Trash2, ArrowLeft, Save, Star, X } from "lucide-react";
 
 const cats = ["E-Commerce & Digital Growth","Logistics Platform","Community & Mobile Platform","Event & Ticketing Infrastructure","Fintech Infrastructure","SaaS Product","Commerce Platform","EdTech Platform","Professional Services","Other"];
@@ -30,22 +31,25 @@ export default function AdminProjectsPage() {
   const [form, setForm] = useState<any>(null);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
+  const [err, setErr] = useState("");
 
-  const load = () => fetch("/api/projects").then(r => r.json()).then(setItems);
+  const load = () => fetch("/api/projects").then(r => r.json()).then(d => setItems(Array.isArray(d) ? d : [])).catch(() => setItems([]));
   useEffect(() => { load(); }, []);
 
   const save = async () => {
-    setSaving(true);
-    const method = form.id ? "PUT" : "POST";
-    const url = form.id ? `/api/projects/${form.id}` : "/api/projects";
-    await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
-    setSaving(false); setMsg("Saved!"); load();
-    setTimeout(() => { setMsg(""); setForm(null); }, 1200);
+    if (!form.title?.trim()) { setErr("Title is required."); return; }
+    setSaving(true); setErr("");
+    const r = await saveJson(form.id ? `/api/projects/${form.id}` : "/api/projects", form.id ? "PUT" : "POST", form);
+    setSaving(false);
+    if (!r.ok) { setErr(r.error); return; }
+    setMsg("Saved!"); load();
+    setTimeout(() => { setMsg(""); setForm(null); }, 900);
   };
 
   const del = async (id: string) => {
     if (!confirm("Delete project?")) return;
-    await fetch(`/api/projects/${id}`, { method: "DELETE" });
+    const res = await fetch(`/api/projects/${id}`, { method: "DELETE" });
+    if (!res.ok) alert("Could not delete this project.");
     load();
   };
 
@@ -57,6 +61,7 @@ export default function AdminProjectsPage() {
         {msg && <span className="text-electric text-xs font-mono ml-2">{msg}</span>}
         <div className="ml-auto"><button onClick={save} disabled={saving} className="btn-primary text-sm py-2 disabled:opacity-50"><Save size={14} /> {saving ? "Saving..." : "Save"}</button></div>
       </div>
+      {err && <p role="alert" className="mb-4 rounded-sm border border-red-400/40 bg-red-400/10 px-3 py-2 text-sm text-red-300">{err}</p>}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div><label className="field-label">Title *</label><input value={form.title} onChange={e => setForm({...form, title: e.target.value})} className="field-input" /></div>
         <div><label className="field-label">Client</label><input value={form.client ?? ""} onChange={e => setForm({...form, client: e.target.value})} className="field-input" /></div>
