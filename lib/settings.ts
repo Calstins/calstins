@@ -12,6 +12,9 @@ export const SETTINGS_DEFAULTS = {
 } as const;
 
 /** Shown on the contact page until the owner edits them in admin (owner confirmed these on 2026-10-09). */
+/** Calstins WhatsApp line, used by the chat widget until a different number is saved in Admin > Company & story. */
+export const DEFAULT_WHATSAPP = "+234 901 823 8968";
+
 export const DEFAULT_CONTACT_PROMISES = ["Response within 24 hours", "Free 30-min consultation", "Transparent project scoping", "Fixed-price or milestone billing"];
 
 export type PublicSettings = Omit<CompanySettings, "registrationNumber" | "registrationVerified" | "showContactDetails" | "contactPromises" | "id" | "key" | "createdAt" | "updatedAt"> & {

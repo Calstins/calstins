@@ -3,10 +3,16 @@ import { useEffect, useRef, useState } from "react";
 import { MessageCircle, X, Send } from "lucide-react";
 
 /**
- * Floating WhatsApp chat launcher. It only renders when the owner has entered a WhatsApp number in
- * Admin > Company & story and switched "Show phone, WhatsApp and social links" on.
+ * Floating WhatsApp chat launcher. The number comes from Admin > Company & story (falling back to the Calstins line).
  * Opens wa.me with a pre-filled message; nothing is sent to us or any third party until the visitor presses Send in WhatsApp.
  */
+const TOPICS = [
+  { label: "Website or app", text: "Hello Calstins, I would like a quote for a website or app. Here is a little about my business: " },
+  { label: "Business registration", text: "Hello Calstins, I need help registering my business with CAC. Could you tell me the process and cost?" },
+  { label: "SEO & growth", text: "Hello Calstins, I would like to grow my business online (SEO, ads or email). Can we talk?" },
+  { label: "Tech advisory", text: "Hello Calstins, I need technology advisory for a project I am planning. Can we book a discovery call?" },
+];
+
 export default function WhatsAppWidget({ number, company }: { number: string; company: string }) {
   const digits = number.replace(/[^\d]/g, "");
   const [open, setOpen] = useState(false);
@@ -37,7 +43,7 @@ export default function WhatsAppWidget({ number, company }: { number: string; co
             <span className="grid h-10 w-10 place-items-center rounded-full bg-white/15"><MessageCircle size={20} aria-hidden /></span>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold">{company}</p>
-              <p className="text-xs text-white/80">Typically replies within 24 hours</p>
+              <p className="text-xs text-white/80">{number} · replies within 24 hours</p>
             </div>
             <button type="button" onClick={() => { setOpen(false); btn.current?.focus(); }} aria-label="Close chat" className="grid h-8 w-8 place-items-center rounded-full hover:bg-white/15"><X size={16} aria-hidden /></button>
           </header>
@@ -45,7 +51,12 @@ export default function WhatsAppWidget({ number, company }: { number: string; co
             <p className="max-w-[85%] rounded-2xl rounded-tl-sm bg-white px-3.5 py-2.5 text-sm shadow-sm">Hi 👋 How can we help? Tell us a little about what you need and we will reply on WhatsApp.</p>
             <label className="block">
               <span className="sr-only">Your message</span>
-              <textarea value={msg} onChange={(e) => setMsg(e.target.value)} rows={3} maxLength={500} className="w-full resize-none rounded-xl border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:border-[#128C7E]" />
+              <div className="flex flex-wrap gap-1.5" role="group" aria-label="Quick topics">
+              {TOPICS.map((t) => (
+                <button key={t.label} type="button" onClick={() => setMsg(t.text)} className="rounded-full border border-[#128C7E]/30 bg-white px-3 py-1 text-xs font-medium text-[#075E54] hover:bg-[#128C7E]/10">{t.label}</button>
+              ))}
+            </div>
+            <textarea placeholder="Type your message…" value={msg} onChange={(e) => setMsg(e.target.value)} rows={4} maxLength={500} className="w-full resize-none rounded-xl border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:border-[#128C7E]" />
             </label>
             <a href={href} target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)}
               className="flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 py-3 text-sm font-semibold text-[#0b2e1a] transition-colors hover:bg-[#3be07a]">

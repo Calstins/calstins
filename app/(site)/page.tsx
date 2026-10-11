@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import Intro from "@/components/motion/Intro";
 import Reveal from "@/components/motion/Reveal";
-import AgencyScene from "@/components/motion/AgencyScene";
+import TechBackdrop from "@/components/motion/TechBackdrop";
 import StoryTimeline from "@/components/motion/StoryTimeline";
 import ArrowButton from "@/components/ui/ArrowButton";
 import SectionHeader from "@/components/ui/SectionHeader";
@@ -28,11 +28,9 @@ export default async function HomePage() {
     <>
       {/* ───────── Hero ───────── */}
       <section className="surface-dark relative isolate overflow-hidden">
-        {/* WebGL scene: the globe sits behind the right column, the particle field and ribbons span the whole hero. */}
-        <AgencyScene className="absolute inset-0 -z-10 h-full w-full" />
+        <TechBackdrop className="absolute inset-0 -z-10 h-full w-full" />
         <Intro className="container-wide relative z-10 grid gap-16 pb-24 pt-20 md:pb-32 md:pt-28 lg:grid-cols-[1.45fr_1fr] lg:items-center lg:gap-10">
           <div>
-            <p data-anim className="eyebrow mb-8">{HERO.eyebrow}</p>
             <h1 data-anim data-split className="t-display">
               {HERO.lines[0]}{" "}<br />{HERO.lines[1]}{" "}<br /><span className="accent-word">{HERO.lines[2]}</span>
             </h1>
@@ -43,7 +41,7 @@ export default async function HomePage() {
             </div>
           </div>
 
-          <div data-scene-anchor className="relative grid min-h-[20rem] place-items-center sm:min-h-[26rem] lg:min-h-[34rem]">
+          <div className="relative grid min-h-[20rem] place-items-center sm:min-h-[26rem] lg:min-h-[34rem]">
             {modes.length > 0 && (
             <ol data-anim className="steps-glow relative w-fit max-w-full space-y-0 border-l border-white/15 pl-8" aria-label="How an engagement progresses">
               {modes.map((m, i) => (
